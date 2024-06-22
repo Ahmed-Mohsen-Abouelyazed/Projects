@@ -1,0 +1,3 @@
+".\Objects\Interfacing Bluetooth Module.obj" 
+TO ".\Objects\Interfacing Bluetooth Module" 
+PRINT(".\Listings\Interfacing Bluetooth Module.m51") RAMSIZE(256) 

@@ -1,0 +1,205 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    05/11/2024  01:02:42  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\Interfacing Bluetooth Module.obj TO .\Objects\Interfacing Bluetooth Module PRINT (
+>> .\Listings\Interfacing Bluetooth Module.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\Interfacing Bluetooth Module.obj (INTERFACING_BLUETOOTH_MODULE)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\Interfacing Bluetooth Module (INTERFACING_BLUETOOTH_MODULE)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0002H     UNIT         ?DT?INTERFACING_BLUETOOTH_MODULE
+            IDATA   000AH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     07FDH                  *** GAP ***
+            CODE    0800H     008CH     UNIT         ?C_C51STARTUP
+            CODE    088CH     006CH     UNIT         ?PR?MAIN?INTERFACING_BLUETOOTH_MODULE
+            CODE    08F8H     0036H     UNIT         ?CO?INTERFACING_BLUETOOTH_MODULE
+            CODE    092EH     0027H     UNIT         ?PR?_DELAY?INTERFACING_BLUETOOTH_MODULE
+            CODE    0955H     0019H     UNIT         ?C?LIB_CODE
+            CODE    096EH     0017H     UNIT         ?PR?_SERIALPRINTLN?INTERFACING_BLUETOOTH_MODULE
+            CODE    0985H     000CH     UNIT         ?PR?SERIALBEGIN?INTERFACING_BLUETOOTH_MODULE
+            CODE    0991H     0008H     UNIT         ?PR?_SERIALWRITE?INTERFACING_BLUETOOTH_MODULE
+            CODE    0999H     0004H     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Interfacing Bluetooth Module (INTERFACING_BLUETOOTH_MODULE)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?INTERFACING_BLUETOOTH_MODULE
+  +--> ?C_INITSEG
+
+?PR?MAIN?INTERFACING_BLUETOOTH_MODULE
+  +--> ?PR?SERIALBEGIN?INTERFACING_BLUETOOTH...
+  +--> ?CO?INTERFACING_BLUETOOTH_MODULE
+  +--> ?PR?_DELAY?INTERFACING_BLUETOOTH_MODULE
+
+?PR?_DELAY?INTERFACING_BLUETOOTH_MODULE
+  +--> ?PR?_SERIALPRINTLN?INTERFACING_BLUETO...
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  05/11/2024  01:02:42  PAGE 2
+
+
+
+?PR?_SERIALPRINTLN?INTERFACING_BLUETO...
+  +--> ?PR?_SERIALWRITE?INTERFACING_BLUETOOT...
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Interfacing Bluetooth Module (INTERFACING_BLUETOOTH_MODULE)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        INTERFACING_BLUETOOTH_MODULE
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:0935H         PUBLIC        _delay
+  C:0991H         PUBLIC        _Serialwrite
+  B:00A0H.0       PUBLIC        Fan
+  B:00B0H.2       PUBLIC        Gas_sensor
+  B:0098H.0       PUBLIC        RI
+  B:0098H.1       PUBLIC        TI
+  B:00A0H.4       PUBLIC        buzzer
+  C:088CH         PUBLIC        main
+  D:0099H         PUBLIC        SBUF
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:008DH         PUBLIC        TH1
+  B:0088H.6       PUBLIC        TR1
+  D:0008H         PUBLIC        Charin
+  D:0009H         PUBLIC        str
+  C:0985H         PUBLIC        Serialbegin
+  C:096EH         PUBLIC        _Serialprintln
+  B:00A0H.1       PUBLIC        Light
+  -------         PROC          L?0033
+  -------         ENDPROC       L?0033
+  -------         PROC          _DELAY
+  D:0006H         SYMBOL        time
+  -------         DO            
+  D:0004H         SYMBOL        i
+  D:0002H         SYMBOL        j
+  -------         ENDDO         
+  C:0935H         LINE#         18
+  C:0935H         LINE#         20
+  C:0935H         LINE#         24
+  C:093FH         LINE#         26
+  C:0954H         LINE#         28
+  -------         ENDPROC       _DELAY
+  -------         PROC          _SERIALWRITE
+  D:0007H         SYMBOL        byte
+  C:0991H         LINE#         31
+  C:0991H         LINE#         33
+  C:0991H         LINE#         35
+  C:0993H         LINE#         37
+  C:0996H         LINE#         39
+  C:0998H         LINE#         41
+  -------         ENDPROC       _SERIALWRITE
+  -------         PROC          _SERIALPRINTLN
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  05/11/2024  01:02:42  PAGE 3
+
+
+  D:0001H         SYMBOL        p
+  C:096EH         LINE#         44
+  C:096EH         LINE#         46
+  C:096EH         LINE#         48
+  C:0974H         LINE#         50
+  C:0974H         LINE#         52
+  C:0977H         LINE#         54
+  C:097EH         LINE#         56
+  C:0980H         LINE#         58
+  -------         ENDPROC       _SERIALPRINTLN
+  -------         PROC          SERIALBEGIN
+  C:0985H         LINE#         63
+  C:0985H         LINE#         65
+  C:0985H         LINE#         67
+  C:0988H         LINE#         69
+  C:098BH         LINE#         71
+  C:098EH         LINE#         73
+  C:0990H         LINE#         75
+  -------         ENDPROC       SERIALBEGIN
+  -------         PROC          MAIN
+  C:088CH         LINE#         78
+  C:088CH         LINE#         80
+  C:088CH         LINE#         81
+  C:088EH         LINE#         82
+  C:0890H         LINE#         84
+  C:0893H         LINE#         86
+  C:0896H         LINE#         88
+  C:089CH         LINE#         90
+  C:089FH         LINE#         92
+  C:089FH         LINE#         94
+  C:089FH         LINE#         96
+  C:08A2H         LINE#         98
+  C:08A5H         LINE#         100
+  C:08A8H         LINE#         102
+  C:08AAH         LINE#         104
+  C:08AFH         LINE#         106
+  C:08AFH         LINE#         108
+  C:08B1H         LINE#         110
+  C:08B7H         LINE#         112
+  C:08B7H         LINE#         114
+  C:08B9H         LINE#         116
+  C:08BEH         LINE#         118
+  C:08BEH         LINE#         120
+  C:08C0H         LINE#         122
+  C:08C6H         LINE#         124
+  C:08C6H         LINE#         126
+  C:08C8H         LINE#         129
+  C:08CDH         LINE#         131
+  C:08CDH         LINE#         133
+  C:08CFH         LINE#         135
+  C:08D5H         LINE#         137
+  C:08D5H         LINE#         139
+  C:08D7H         LINE#         142
+  C:08DCH         LINE#         144
+  C:08DCH         LINE#         146
+  C:08DEH         LINE#         148
+  C:08E4H         LINE#         150
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  05/11/2024  01:02:42  PAGE 4
+
+
+  C:08E7H         LINE#         152
+  C:08E7H         LINE#         154
+  C:08EAH         LINE#         155
+  C:08EAH         LINE#         156
+  C:08ECH         LINE#         157
+  C:08F3H         LINE#         158
+  C:08F3H         LINE#         162
+  C:08F6H         LINE#         164
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        INTERFACING_BLUETOOTH_MODULE
+
+  -------         MODULE        ?C?CLDPTR
+  C:0955H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00F7H BYTE (12%) *
+******************************************************************************
+
+Program Size: data=11.0 xdata=0 code=416
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

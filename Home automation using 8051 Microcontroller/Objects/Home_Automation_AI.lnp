@@ -1,0 +1,3 @@
+".\Objects\Home_Automation_AI.obj" 
+TO ".\Objects\Home_Automation_AI" 
+PRINT(".\Listings\Home_Automation_AI.m51") RAMSIZE(256) 
