@@ -1,0 +1,119 @@
+A51 MACRO ASSEMBLER  FGT                                                                  03/17/2024 00:28:04 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\FGT.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE FGT.asm SET(SMALL) DEBUG PRINT(.\Listings\FGT.lst) OBJECT(.\Objects\FGT
+                      .obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+  0090                 1     DAC EQU P1
+  00A5                 2     SAB BIT P2.5
+                       3             
+  0080                 4     FREQ EQU 80H
+  0090                 5     DELAY_VALUE EQU 90H
+                       6     
+                       7     ;*****************************************************************************************
+                       8     
+                       9     ; SQUARE WAVEFORM GENERATION FUNCTION
+                      10     
+0000                  11     FUN_SQUARE:
+0000 120015           12     LCALL CALC_DEL_SQU                                                              ;SUBROUTINE
+                              THAT CALCULATE THE TIMER VALUE TO GENERATE THE SUITABLE DELAY TIME
+                      13     
+0003                  14     AGAIN_SQR:
+0003 759000           15     MOV DAC,#0                                                                              ;OU
+                             TPUT LOW DIGITAL VALUE OF SQUARE WAVEFORM                                                            
+0006 120023           16     LCALL DELAY_SQUARE                                                              ;SUBROUTINE
+                              THAT GENERATE THE DELAY USING TIMERS
+0009 7590FF           17     MOV DAC,#255                                                                    ;OUTPUT HIG
+                             H DIGITAL VALUE OF SQUARE WAVEFORM   
+000C 120023           18     LCALL DELAY_SQUARE                                                              ;SUBROUTINE
+                              THAT GENERATE THE DELAY USING TIMERS
+000F 20A51E           19     JB SAB,SELECT_AGAIN_L                                                   ;IF (SAB==1) GOTO S
+                             ELECT AGAIN                           #FEATURE  :)
+0012 80EF             20     SJMP AGAIN_SQR                                                                  ;GOTO AGAIN
+                             _SQR TO REPEAT SUBROUTINE
+0014 22               21     RET                                                                                        
+                                  ;RETURN OPERATION
+                      22     
+                      23     ;*****************************************************************************************
+                      24     
+                      25     ; SQUARE DELAY CALCULATION FUNCTION
+                      26     
+0015                  27     CALC_DEL_SQU:                                                                   ;timer valu
+                             e = one's complement (2*(250/f))      #EQUATION
+0015 74FA             28     MOV A,#250                                                                              ;A 
+                              = 200 (decimal) (numerator)
+0017 8580F0           29     MOV B,FREQ                                                                              ;B 
+                              = f   (decimal) (denumerator)
+001A 84               30     DIV AB                                                                                  ;A 
+                              = A/B ( integer result )                             #DESIGN FLAW   :(
+001B 75F002           31     MOV B,#2                                                                                ;B 
+                              = 2   (decimal)
+001E A4               32     MUL AB                                                                                  ;A 
+                              = A*B (decimal)     
+001F F4               33     CPL A                                                                                   ;A 
+                              = one's complement (A)
+0020 F590             34     MOV DELAY_VALUE,A                                                               ;DELAY_VALU
+                             E = A  (FOR FURTHER PROCESSING)
+0022 22               35     RET                                                                                        
+                                  ;RETURN OPERATION
+                      36     
+                      37     ;*****************************************************************************************
+                      38     
+                      39     ; SQUARE DELAY POLLING FUNCTION
+                      40     
+A51 MACRO ASSEMBLER  FGT                                                                  03/17/2024 00:28:04 PAGE     2
+
+0023                  41     DELAY_SQUARE:                                                                   ;NOTICE THA
+                             T THE TIMERS ARE ALREADY CONFIGURED IN THE START OF MAIN PROGRAM
+0023 85908D           42     MOV TH1,DELAY_VALUE                                                             ;TH1  = DEL
+                             AY_VALUE
+0026 D28E             43     SETB TR1                                                                                ;TR
+                             1  = 1   ( START TIMER )                             #FEATURE    (=:<) (SECOND CUTE RABIT)
+0028 308FFD           44     BACK_SQU: JNB TF1,BACK_SQU                                              ;IF (TF1!=1) GOTO B
+                             ACK_ST                           (POLLING METHOD USING TF1)
+002B 22               45     RET                                                                                        
+                                  ;RETURN OPERATION
+                      46     
+                      47     ;*****************************************************************************************
+                      48     
+0030                  49     ORG 0030H
+0030                  50             SELECT_AGAIN_L:
+0030 758014           51             MOV FREQ,#20D
+0033 120000           52             LCALL FUN_SQUARE
+0036 80FE             53             H:SJMP H
+                      54     END     
+A51 MACRO ASSEMBLER  FGT                                                                  03/17/2024 00:28:04 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AGAIN_SQR. . . . .  C ADDR   0003H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BACK_SQU . . . . .  C ADDR   0028H   A   
+CALC_DEL_SQU . . .  C ADDR   0015H   A   
+DAC. . . . . . . .  D ADDR   0090H   A   
+DELAY_SQUARE . . .  C ADDR   0023H   A   
+DELAY_VALUE. . . .  N NUMB   0090H   A   
+FREQ . . . . . . .  N NUMB   0080H   A   
+FUN_SQUARE . . . .  C ADDR   0000H   A   
+H. . . . . . . . .  C ADDR   0036H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+SAB. . . . . . . .  B ADDR   00A0H.5 A   
+SELECT_AGAIN_L . .  C ADDR   0030H   A   
+TF1. . . . . . . .  B ADDR   0088H.7 A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

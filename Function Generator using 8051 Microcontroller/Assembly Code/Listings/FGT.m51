@@ -1,0 +1,82 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    03/17/2024  00:28:04  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\FGT.obj TO .\Objects\FGT PRINT (.\Listings\FGT.m51) RAMSIZE (256)
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\FGT.obj (FGT)
+
+
+LINK MAP OF MODULE:  .\Objects\FGT (FGT)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0038H     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\FGT (FGT)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        FGT
+  C:0003H         SYMBOL        AGAIN_SQR
+  D:00F0H         SYMBOL        B
+  C:0028H         SYMBOL        BACK_SQU
+  C:0015H         SYMBOL        CALC_DEL_SQU
+  D:0090H         SYMBOL        DAC
+  C:0023H         SYMBOL        DELAY_SQUARE
+  N:0090H         SYMBOL        DELAY_VALUE
+  N:0080H         SYMBOL        FREQ
+  C:0000H         SYMBOL        FUN_SQUARE
+  C:0036H         SYMBOL        H
+  D:0090H         SYMBOL        P1
+  D:00A0H         SYMBOL        P2
+  B:00A0H.5       SYMBOL        SAB
+  C:0030H         SYMBOL        SELECT_AGAIN_L
+  B:0088H.7       SYMBOL        TF1
+  D:008DH         SYMBOL        TH1
+  B:0088H.6       SYMBOL        TR1
+  C:0000H         LINE#         12
+  C:0003H         LINE#         15
+  C:0006H         LINE#         16
+  C:0009H         LINE#         17
+  C:000CH         LINE#         18
+  C:000FH         LINE#         19
+  C:0012H         LINE#         20
+  C:0014H         LINE#         21
+  C:0015H         LINE#         28
+  C:0017H         LINE#         29
+  C:001AH         LINE#         30
+  C:001BH         LINE#         31
+  C:001EH         LINE#         32
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/17/2024  00:28:04  PAGE 2
+
+
+  C:001FH         LINE#         33
+  C:0020H         LINE#         34
+  C:0022H         LINE#         35
+  C:0023H         LINE#         42
+  C:0026H         LINE#         43
+  C:0028H         LINE#         44
+  C:002BH         LINE#         45
+  C:0030H         LINE#         51
+  C:0033H         LINE#         52
+  C:0036H         LINE#         53
+  -------         ENDMOD        FGT
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0034H BYTE ( 2%) *
+******************************************************************************
+
+Program Size: data=8.0 xdata=0 code=56
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

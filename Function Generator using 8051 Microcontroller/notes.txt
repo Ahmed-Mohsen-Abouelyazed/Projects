@@ -1,0 +1,11 @@
+*INTIALIZE lcd,keypad (Done)
+*GET Siganl type:
+1)"Enter Signal type : " (DONE)
+2)InPut signal type (DONE)
+3) Select the suitable function for signal type.(-)
+*GET FREQUENCY: (DONE)
+*O/P SIGNAL :
+1--->SAWTOOTH , 2--->SQUARE , 3 ---->SINE (DONE)
+FUN_SAWTOOTH (DONE)
+FUN_SQUARE (DONE)
+FUN_SINE

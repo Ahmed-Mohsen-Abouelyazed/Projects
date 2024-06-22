@@ -1,0 +1,3 @@
+".\Objects\Calculator using Embedded C.obj" 
+TO ".\Objects\Calculator using Embedded C" 
+PRINT(".\Listings\Calculator using Embedded C.m51") RAMSIZE(256) 

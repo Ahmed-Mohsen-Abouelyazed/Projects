@@ -1,0 +1,3 @@
+".\Objects\eldeep_FG.obj" 
+TO ".\Objects\eldeep_FG" 
+PRINT(".\Listings\eldeep_FG.m51") RAMSIZE(256) 

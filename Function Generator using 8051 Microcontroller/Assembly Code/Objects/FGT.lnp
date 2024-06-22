@@ -1,0 +1,3 @@
+".\Objects\FGT.obj" 
+TO ".\Objects\FGT" 
+PRINT(".\Listings\FGT.m51") RAMSIZE(256) 

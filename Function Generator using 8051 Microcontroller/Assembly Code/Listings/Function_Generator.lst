@@ -1,0 +1,579 @@
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Function_Generator.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Function_Generator.asm SET(SMALL) DEBUG PRINT(.\Listings\Function_Gener
+                      ator.lst) OBJECT(.\Objects\Function_Generator.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+  0090                 1     KEYPAD_PORT EQU P1
+  0090                 2     C1 BIT P1.0
+  0091                 3     C2 BIT P1.1
+  0092                 4     C3 BIT P1.2
+  0093                 5     C4 BIT P1.3
+  0094                 6     RO4 BIT P1.4
+  0095                 7     RO3 BIT P1.5
+  0096                 8     RO2 BIT P1.6
+  0097                 9     RO1 BIT P1.7
+  00B0                10     LCD_PORT EQU P3
+  00A6                11     Rs BIT P2.6
+  00A7                12     E BIT P2.7
+  0090                13     SIGNAL_TYPE EQU 90H
+  00B4                14     SAB BIT P3.4
+                      15     ;************************************************************************************
+                      16     
+0200                  17     ORG 200H                                        
+0200 20455252         18             ERR: DB ' ERROR',0      
+0204 4F5200                  
+                      19     
+0300                  20     ORG 300H                                        ;INITIAL MESSAGE
+0300 48454C4C         21             WELCOME_MSG: DB 'HELLO WORLD!',0
+0304 4F20574F                
+0308 524C4421                
+030C 00                      
+                      22     
+0310                  23     ORG 310H                         
+0310 485A00           24             HZ_MSG: DB 'HZ',0
+                      25                     
+0320                  26     ORG 320H                                        ;KEYBOARD BUTTONS
+0320 55333231         27             ROW1: DB 'U','3','2','1',0
+0324 00                      
+0325 55363534         28             ROW2: DB 'U','6','5','4',0
+0329 00                      
+032A 55393837         29             ROW3: DB 'U','9','8','7',0
+032E 00                      
+032F 5520302E         30             ROW4: DB 'U',' ','0','.',0
+0333 00                      
+                      31     
+0400                  32     ORG 400H                                        
+0400 20454E54         33             FREQUENCY_MSG: DB ' ENTER F = ',0
+0404 45522046                
+0408 203D2000                
+                      34     
+0500                  35     ORG 500H
+0500 454E5445         36             SIGNAL_TYPE_MSG: DB 'ENTER SIG TYP: ',0
+0504 52205349                
+0508 47205459                
+050C 503A2000                
+                      37                     
+0600                  38     ORG 600H
+0600 8096ACC0         39             SIN_FUN_VALUES: DB 128,150,172,192,210,226,239,248,253,255,253,248,239,226,210,192,
+                             172,150,128,106,84,64,46,30,17,8,2,0,2,8,17,30,46,64,84,106,128
+0604 D2E2EFF8                
+0608 FDFFFDF8                
+060C EFE2D2C0                
+0610 AC96806A                
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     2
+
+0614 54402E1E                
+0618 11080200                
+061C 0208111E                
+0620 2E40546A                
+0624 80                      
+                      40                     
+0800                  41     ORG 800H
+0800 204F5554         42             OUT_OF_RANGE_MESSAGE: DB ' OUT OF RANGE! ',0
+0804 204F4620                
+0808 52414E47                
+080C 45212000                
+                      43     
+                      44     ;************************************************************************************
+0810                  45     HELLO_MSG:
+0810 900300           46     MOV DPTR,#300H                                  ;Send Hello message
+0813                  47     AGAIN1:
+0813 E4               48     CLR A
+0814 93               49     MOVC A,@A+DPTR
+0815 6006             50     JZ HERE1
+0817 120135           51     LCALL LCD_DATA
+081A A3               52     INC DPTR
+081B 80F6             53     SJMP AGAIN1
+081D                  54     HERE1:                                           
+081D 120142           55     LCALL DELAY
+0820 120142           56     LCALL DELAY
+0823 22               57     RET
+                      58     
+                      59     ;************************************************************************************
+0824                  60     SIG_TYP_MSG:
+0824 900500           61     MOV DPTR,#500H                                  ;Send signal type message
+0827                  62     AGAIN2:
+0827 E4               63     CLR A
+0828 93               64     MOVC A,@A+DPTR
+0829 6006             65     JZ HERE2
+082B 120135           66     LCALL LCD_DATA
+082E A3               67     INC DPTR
+082F 80F6             68     SJMP AGAIN2
+0831                  69     HERE2:
+0831 22               70     RET
+                      71     
+                      72     ;************************************************************************************
+0832                  73     ENT_FREQ_MSG:
+0832 900400           74     MOV DPTR,#400H
+0835                  75     FREQUENCY_AGAIN:
+0835 E4               76     CLR A
+0836 93               77     MOVC A,@A+DPTR
+0837 6007             78     JZ GET_FREQUENCY_
+0839 120135           79     LCALL LCD_DATA
+083C A3               80     INC DPTR
+083D 80F6             81     SJMP FREQUENCY_AGAIN
+083F 22               82     RET
+0840                  83     GET_FREQUENCY_:
+0840 020058           84     LJMP GET_FREQUENCY
+                      85     
+                      86     ;************************************************************************************
+0843                  87     ERROR_MESSAGE:
+0843 120114           88     LCALL LCD_INIT
+0846 900200           89     MOV DPTR,#200H
+0849                  90     ERR_AGAIN:
+0849 E4               91     CLR A
+084A 93               92     MOVC A,@A+DPTR
+084B 6006             93     JZ ERR_F
+084D 120135           94     LCALL LCD_DATA
+0850 A3               95     INC DPTR
+0851 80F6             96     SJMP ERR_AGAIN
+0853                  97     ERR_F:
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     3
+
+0853 120142           98     LCALL DELAY
+0856 120142           99     LCALL DELAY
+0859 120114          100     LCALL LCD_INIT
+085C 0208D3          101     LJMP START_AGAIN
+085F 22              102     RET
+                     103     
+                     104     ;************************************************************************************
+0860                 105     HZ_TYPE:        
+0860 900310          106     MOV DPTR,#310H
+0863                 107     HZ_AGAIN:
+0863 E4              108     CLR A
+0864 93              109     MOVC A,@A+DPTR
+0865 6006            110     JZ OUT_MSG
+0867 120135          111     LCALL LCD_DATA
+086A A3              112     INC DPTR
+086B 80F6            113     SJMP HZ_AGAIN
+086D 22              114     OUT_MSG:RET
+                     115     
+                     116     ;************************************************************************************
+086E                 117     OORM:
+086E 120114          118     LCALL LCD_INIT
+0871 900800          119     MOV DPTR,#800H
+0874                 120     ERROR_AGAIN:
+0874 E4              121     CLR A
+0875 93              122     MOVC A,@A+DPTR
+0876 120135          123     LCALL LCD_DATA
+0879 A3              124     INC DPTR
+087A 80F8            125     SJMP ERROR_AGAIN
+087C 120114          126     LCALL LCD_INIT
+087F 22              127     RET
+                     128     
+                     129     ;***************************** SAWTOOTH WAVE FUNCTION *****************************
+0880                 130     FUN_SAWTOOTH:
+0880                 131     AGAIN_SAW:
+0880 7FFF            132     MOV R7,#255
+0882 7400            133     MOV A,#00H
+0884 120893          134     LCALL CALC_DEL_SAW
+0887                 135     REPEAT:
+0887 F590            136     MOV P1,A
+0889 04              137     INC A
+                     138     
+088A DFFB            139     DJNZ R7,REPEAT
+088C E4              140     CLR A
+088D 20B440          141     JB SAB,SELECT_AGAIN
+0890 80EE            142     SJMP AGAIN_SAW
+0892 22              143     RET
+                     144     
+                     145     ;***************************** CALCULATE SAWTOOTH DELAY FUNCTION **************************
+                             ***
+0893                 146     CALC_DEL_SAW:
+0893 E530            147     MOV A,30H
+0895 75F00A          148     MOV B,#10
+0898 A4              149     MUL AB                                  ;MAX FREQUENCY = 46.08 KHz
+0899 8531F0          150     MOV B,31H
+089C 25F0            151     ADD A,B
+089E B42E02          152     CJNE A,#46,NOT_EQU
+08A1 8002            153     SJMP SOE_46
+                     154     
+08A3                 155     NOT_EQU:
+08A3 5006            156     JNC OUT_OF_RANGE
+                     157     
+08A5                 158     SOE_46:
+08A5 F5F0            159     MOV B,A
+08A7 74E6            160     MOV A,#230
+08A9 84              161     DIV AB
+                     162     
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     4
+
+08AA 22              163     RET
+                     164     
+08AB                 165     OUT_OF_RANGE:
+08AB 12086E          166     LCALL OORM
+08AE 0208D3          167     LJMP START_AGAIN
+08B1 22              168     RET
+                     169     
+                     170     ;***************************** SQUARE WAVE FUNCTION *****************************
+08B2                 171     FUN_SQUARE:
+                     172     
+                     173     
+08B2                 174     AGAIN_SQR:
+08B2 7590FF          175     MOV P1,#255
+                     176     
+08B5 759000          177     MOV P1,#0
+                     178     
+08B8 20B415          179     JB SAB,SELECT_AGAIN
+08BB 80F5            180     SJMP AGAIN_SQR
+08BD 22              181     RET
+                     182     
+                     183     ;***************************** SINE WAVE FUNCTION *****************************
+08BE                 184     FUN_SINE:
+08BE                 185     AGAIN_SINE: 
+08BE 900600          186     MOV DPTR,#600H
+08C1 7A24            187     MOV R2,#36
+08C3                 188     BACK_SINE:
+08C3 E4              189     CLR A
+08C4 93              190     MOVC A,@A+DPTR
+08C5 F590            191     MOV P1,A
+08C7 A3              192     INC DPTR
+08C8 DAF9            193     DJNZ R2, BACK_SINE
+08CA 20B403          194     JB SAB,SELECT_AGAIN
+08CD 80EF            195     SJMP AGAIN_SINE
+08CF 22              196     RET
+08D0                 197     SELECT_AGAIN:
+08D0 02003C          198     LJMP SELECT_AGAIN_
+                     199     ;***************************************                        MAIN PROGRAM               
+                                  *********************************************
+                     200     
+                     201     ;INITIATE THE PROGRAM
+08D3                 202     START_AGAIN:
+0030                 203     ORG 30H
+0030 7580FF          204     MOV P0,#0FFH                                    ;P0 is connected to KEYPAD as an input port
+                                  
+0033 75900F          205     MOV KEYPAD_PORT,#0FH                        
+0036 120114          206     LCALL LCD_INIT
+0039 120810          207     LCALL HELLO_MSG
+                     208     
+003C                 209     SELECT_AGAIN_:
+003C 120114          210     LCALL LCD_INIT
+                     211     
+                     212     ;**********************GET      SIGNAL TYPE FROM THE USER***************************
+                     213     
+003F 120824          214     LCALL SIG_TYP_MSG
+0042 12009D          215     LCALL READ_KEY                                  ;GET SIGNAL TYPE FROM KEYPAD
+0045 120135          216     LCALL LCD_DATA
+0048 120142          217     LCALL DELAY
+004B 120142          218     LCALL DELAY
+004E 540F            219     ANL A,#0FH
+0050 F590            220     MOV SIGNAL_TYPE,A
+                     221     
+                     222     ;**********************GET THE FREQUENCY FROM THE USER***************************
+                     223     
+0052 120114          224     LCALL LCD_INIT
+0055 120832          225     LCALL ENT_FREQ_MSG
+                     226     
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     5
+
+0058                 227     GET_FREQUENCY:
+                     228     ;FOR FIRST DIGIT "HIGH"
+0058 12009D          229     LCALL READ_KEY
+005B 120135          230     LCALL LCD_DATA
+005E 540F            231     ANL A,#0FH
+0060 F531            232     MOV 31H,A
+                     233     ;FOR SECOND DIGIT  "LOW"
+0062 12009D          234     LCALL READ_KEY
+0065 120135          235     LCALL LCD_DATA
+0068 540F            236     ANL A,#0FH
+006A F530            237     MOV 30H,A                       
+                     238     ;NOW WE GOT THE FREQUENCY'S HEX IN 31(HIGH) & 30(LOW)
+                     239     ;***********************TO TYPE THE WORD HZ*******************************
+006C                 240     SPACE_TYPE:
+006C 7400            241     MOV A,#00H
+006E 120135          242     LCALL LCD_DATA
+0071 120860          243     LCALL HZ_TYPE
+                     244     
+                     245     ;*******************TO SHOW FREQUENCY ON THE LCD*********************
+                     246     
+                     247     
+                     248     
+                     249     
+                     250     
+                     251     
+                     252     
+                     253     
+                     254     
+                     255     
+                     256     
+                     257     
+                     258     
+                     259     
+                     260     
+                     261     
+                     262     
+                     263     
+                     264     
+                     265     
+                     266     
+                     267     
+                     268     
+                     269     ;**********************************************************************************
+0074                 270     SETTING_UP_THE_DIGITS:
+                     271     ;FIRST WE CONVERT THEM FROM ASCII TO NUMBERS AND STORE THEM
+0074 E531            272     MOV A,31H
+0076 540F            273     ANL A,#0FH
+0078 F531            274     MOV 31H,A
+                     275     
+007A E530            276     MOV A,30H
+007C 540F            277     ANL A,#0FH
+007E F530            278     MOV 30H,A
+                     279     
+0080 E590            280     MOV A,SIGNAL_TYPE
+0082 B40103          281     CJNE A,#1,NOT_FUN_SAWTOOTH
+0085 120880          282     LCALL FUN_SAWTOOTH
+                     283     
+0088                 284     NOT_FUN_SAWTOOTH:
+0088 B40203          285     CJNE A,#2,NOT_FUN_SQUARE
+008B 1208B2          286     LCALL FUN_SQUARE
+                     287     
+008E                 288     NOT_FUN_SQUARE:
+008E B40303          289     CJNE A,#3,ERROR
+0091 1208BE          290     LCALL FUN_SINE
+                     291     
+0094 120843          292     ERROR: LCALL ERROR_MESSAGE
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     6
+
+0097 0208D3          293     LJMP START_AGAIN
+                     294     
+009A 020150          295     LJMP END_PROGRAM
+                     296     
+                     297     ;***********************************************************************************
+                     298     
+                     299     ;KEYPAD INTERFACING
+                     300     
+009D                 301     READ_KEY:
+009D                 302     CHECK_1:                                        ;CHECK IF A BUTTON WAS PRESSED
+009D C297            303     CLR RO1
+009F C296            304     CLR RO2
+00A1 C295            305     CLR RO3
+00A3 C294            306     CLR RO4
+                     307     
+00A5 E590            308     MOV A,KEYPAD_PORT
+00A7 540F            309     ANL A,#0FH
+00A9 B40F02          310     CJNE A,#0FH,CHECK_2
+00AC 80EF            311     SJMP CHECK_1
+00AE                 312     CHECK_2:                                        ;MAYBE IT WAS JUST A SPIKE NOISE SO, WAIT F
+                             OR DEBOUNCE AND CHECK AGAIN
+00AE 3142            313     ACALL DELAY
+00B0 E590            314     MOV A,KEYPAD_PORT
+00B2 540F            315     ANL A,#0FH
+00B4 B40F02          316     CJNE A,#0FH,CHECK_ROW
+00B7 80E4            317     SJMP CHECK_1
+                     318     
+00B9                 319     CHECK_ROW:                                      ;CHECK IN WHICH ROW THE PRESSED BUTTON IS
+00B9 C297            320     CLR RO1
+00BB D296            321     SETB RO2
+00BD D295            322     SETB RO3
+00BF D294            323     SETB RO4
+00C1 E590            324     MOV A,KEYPAD_PORT
+00C3 B47F2A          325     CJNE A,#01111111B,ROW_1
+                     326     
+00C6 D297            327     SETB RO1
+00C8 C296            328     CLR RO2
+00CA D295            329     SETB RO3
+00CC D294            330     SETB RO4
+00CE E590            331     MOV A,KEYPAD_PORT
+00D0 B4BF22          332     CJNE A,#10111111B,ROW_2
+                     333     
+00D3 D297            334     SETB RO1
+00D5 D296            335     SETB RO2
+00D7 C295            336     CLR RO3
+00D9 D294            337     SETB RO4
+00DB E590            338     MOV A,KEYPAD_PORT
+00DD B4DF1A          339     CJNE A,#11011111B,ROW_3
+                     340     
+00E0 D297            341     SETB RO1
+00E2 D296            342     SETB RO2
+00E4 D295            343     SETB RO3
+00E6 C294            344     CLR RO4
+00E8 E590            345     MOV A,KEYPAD_PORT
+00EA B4EF12          346     CJNE A,#11101111B,ROW_4
+                     347     
+00ED 02009D          348     LJMP CHECK_1
+                     349     
+00F0                 350     ROW_1:                                          ;PUT THE ADDRESS OF THE RIGHT ROW IN DPTR
+00F0 900320          351     MOV DPTR,#ROW1
+00F3 800F            352     SJMP FIND
+00F5                 353     ROW_2:
+00F5 900325          354     MOV DPTR,#ROW2
+00F8 800A            355     SJMP FIND
+00FA                 356     ROW_3:
+00FA 90032A          357     MOV DPTR,#ROW3
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     7
+
+00FD 8005            358     SJMP FIND
+00FF                 359     ROW_4:
+00FF 90032F          360     MOV DPTR,#ROW4
+0102 8000            361     SJMP FIND
+                     362     
+0104                 363     FIND:                                           ;FIND IN WHICH COLUMN THE PRESSED BUTTON IS
+0104 13              364     RRC A
+0105 5003            365     JNC MATCH
+0107 A3              366     INC DPTR
+0108 80FA            367     SJMP FIND
+                     368     
+010A                 369     MATCH:                                          ;TAKE THE NUBER AND WRITE IT ON THE LCD
+010A E4              370     CLR A
+010B 93              371     MOVC A,@A+DPTR
+010C B44304          372     CJNE A,#'C',PRINT
+010F 120114          373     LCALL LCD_INIT
+0112 22              374     RET
+0113                 375     PRINT:
+0113 22              376     RET
+                     377     
+                     378     ;*****************************
+                     379     ;LCD INTERFACING
+0114                 380     LCD_INIT:
+0114 7480            381     MOV A,#80H                                      ;FORCE CURSOR TO 1ST LINE
+0116 312A            382     ACALL LCD_COMMAND
+0118 7438            383     MOV A,#38H                                      ;2 LINES AND 5*7 MATRIX
+011A 312A            384     ACALL LCD_COMMAND
+011C 740E            385     MOV A,#0EH                                      ;DISPLAY ON, CURSOR BLINKING
+011E 312A            386     ACALL LCD_COMMAND
+0120 7401            387     MOV A,#01H                                      ;CLEAR DISPLAY SCREEN
+0122 312A            388     ACALL LCD_COMMAND
+0124 22              389     RET
+0125                 390     LCD_2ND_LINE:
+0125 74C0            391     MOV A,#0C0H                                      ;START 2ND LINE 
+0127 312A            392     ACALL LCD_COMMAND
+0129 22              393     RET
+012A                 394     LCD_COMMAND:                                    ;APPLY A COMMAND TO THE LCD
+012A F5B0            395     MOV LCD_PORT,A
+012C C2A6            396     CLR Rs
+012E D2A7            397     SETB E
+0130 C2A7            398     CLR E
+0132 3142            399     ACALL DELAY
+0134 22              400     RET
+0135                 401     LCD_DATA:                                       ;WRITE TO THE LCD
+0135 F5B0            402     MOV LCD_PORT,A
+0137 D2A6            403     SETB Rs
+0139 D2A7            404     SETB E
+013B C2A7            405     CLR E
+013D 7B60            406     MOV R3,#60H
+013F 3144            407     ACALL LOOP2
+0141 22              408     RET
+                     409     
+0142                 410     DELAY:                                          ;USED FOR BOTH LCD AND DEBOUNCING DELAY
+0142 7B96            411     MOV R3,#150D
+0144 7AFF            412     LOOP2: MOV R2,#255D
+0146 DAFE            413     LOOP1: DJNZ R2,LOOP1
+0148 DBFA            414     DJNZ R3,LOOP2
+014A 22              415     RET
+                     416     
+014B                 417     SL_CURSOR:
+014B 7410            418     MOV A,#10H                                      ;SHIFT LEFT CURSOR 
+014D 312A            419     ACALL LCD_COMMAND
+014F 22              420     RET
+                     421     
+0150                 422     END_PROGRAM:
+                     423     END
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     8
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E                T Y P E  V A L U E   ATTRIBUTES
+
+AGAIN1. . . . . . . .  C ADDR   0813H   A   
+AGAIN2. . . . . . . .  C ADDR   0827H   A   
+AGAIN_SAW . . . . . .  C ADDR   0880H   A   
+AGAIN_SINE. . . . . .  C ADDR   08BEH   A   
+AGAIN_SQR . . . . . .  C ADDR   08B2H   A   
+B . . . . . . . . . .  D ADDR   00F0H   A   
+BACK_SINE . . . . . .  C ADDR   08C3H   A   
+C1. . . . . . . . . .  B ADDR   0090H.0 A   
+C2. . . . . . . . . .  B ADDR   0090H.1 A   
+C3. . . . . . . . . .  B ADDR   0090H.2 A   
+C4. . . . . . . . . .  B ADDR   0090H.3 A   
+CALC_DEL_SAW. . . . .  C ADDR   0893H   A   
+CHECK_1 . . . . . . .  C ADDR   009DH   A   
+CHECK_2 . . . . . . .  C ADDR   00AEH   A   
+CHECK_ROW . . . . . .  C ADDR   00B9H   A   
+DELAY . . . . . . . .  C ADDR   0142H   A   
+E . . . . . . . . . .  B ADDR   00A0H.7 A   
+END_PROGRAM . . . . .  C ADDR   0150H   A   
+ENT_FREQ_MSG. . . . .  C ADDR   0832H   A   
+ERR . . . . . . . . .  C ADDR   0200H   A   
+ERROR . . . . . . . .  C ADDR   0094H   A   
+ERROR_AGAIN . . . . .  C ADDR   0874H   A   
+ERROR_MESSAGE . . . .  C ADDR   0843H   A   
+ERR_AGAIN . . . . . .  C ADDR   0849H   A   
+ERR_F . . . . . . . .  C ADDR   0853H   A   
+FIND. . . . . . . . .  C ADDR   0104H   A   
+FREQUENCY_AGAIN . . .  C ADDR   0835H   A   
+FREQUENCY_MSG . . . .  C ADDR   0400H   A   
+FUN_SAWTOOTH. . . . .  C ADDR   0880H   A   
+FUN_SINE. . . . . . .  C ADDR   08BEH   A   
+FUN_SQUARE. . . . . .  C ADDR   08B2H   A   
+GET_FREQUENCY . . . .  C ADDR   0058H   A   
+GET_FREQUENCY_. . . .  C ADDR   0840H   A   
+HELLO_MSG . . . . . .  C ADDR   0810H   A   
+HERE1 . . . . . . . .  C ADDR   081DH   A   
+HERE2 . . . . . . . .  C ADDR   0831H   A   
+HZ_AGAIN. . . . . . .  C ADDR   0863H   A   
+HZ_MSG. . . . . . . .  C ADDR   0310H   A   
+HZ_TYPE . . . . . . .  C ADDR   0860H   A   
+KEYPAD_PORT . . . . .  D ADDR   0090H   A   
+LCD_2ND_LINE. . . . .  C ADDR   0125H   A   
+LCD_COMMAND . . . . .  C ADDR   012AH   A   
+LCD_DATA. . . . . . .  C ADDR   0135H   A   
+LCD_INIT. . . . . . .  C ADDR   0114H   A   
+LCD_PORT. . . . . . .  D ADDR   00B0H   A   
+LOOP1 . . . . . . . .  C ADDR   0146H   A   
+LOOP2 . . . . . . . .  C ADDR   0144H   A   
+MATCH . . . . . . . .  C ADDR   010AH   A   
+NOT_EQU . . . . . . .  C ADDR   08A3H   A   
+NOT_FUN_SAWTOOTH. . .  C ADDR   0088H   A   
+NOT_FUN_SQUARE. . . .  C ADDR   008EH   A   
+OORM. . . . . . . . .  C ADDR   086EH   A   
+OUT_MSG . . . . . . .  C ADDR   086DH   A   
+OUT_OF_RANGE. . . . .  C ADDR   08ABH   A   
+OUT_OF_RANGE_MESSAGE.  C ADDR   0800H   A   
+P0. . . . . . . . . .  D ADDR   0080H   A   
+P1. . . . . . . . . .  D ADDR   0090H   A   
+P2. . . . . . . . . .  D ADDR   00A0H   A   
+P3. . . . . . . . . .  D ADDR   00B0H   A   
+PRINT . . . . . . . .  C ADDR   0113H   A   
+A51 MACRO ASSEMBLER  FUNCTION_GENERATOR                                                   03/12/2024 17:02:55 PAGE     9
+
+READ_KEY. . . . . . .  C ADDR   009DH   A   
+REPEAT. . . . . . . .  C ADDR   0887H   A   
+RO1 . . . . . . . . .  B ADDR   0090H.7 A   
+RO2 . . . . . . . . .  B ADDR   0090H.6 A   
+RO3 . . . . . . . . .  B ADDR   0090H.5 A   
+RO4 . . . . . . . . .  B ADDR   0090H.4 A   
+ROW1. . . . . . . . .  C ADDR   0320H   A   
+ROW2. . . . . . . . .  C ADDR   0325H   A   
+ROW3. . . . . . . . .  C ADDR   032AH   A   
+ROW4. . . . . . . . .  C ADDR   032FH   A   
+ROW_1 . . . . . . . .  C ADDR   00F0H   A   
+ROW_2 . . . . . . . .  C ADDR   00F5H   A   
+ROW_3 . . . . . . . .  C ADDR   00FAH   A   
+ROW_4 . . . . . . . .  C ADDR   00FFH   A   
+RS. . . . . . . . . .  B ADDR   00A0H.6 A   
+SAB . . . . . . . . .  B ADDR   00B0H.4 A   
+SELECT_AGAIN. . . . .  C ADDR   08D0H   A   
+SELECT_AGAIN_ . . . .  C ADDR   003CH   A   
+SETTING_UP_THE_DIGITS  C ADDR   0074H   A   
+SIGNAL_TYPE . . . . .  N NUMB   0090H   A   
+SIGNAL_TYPE_MSG . . .  C ADDR   0500H   A   
+SIG_TYP_MSG . . . . .  C ADDR   0824H   A   
+SIN_FUN_VALUES. . . .  C ADDR   0600H   A   
+SL_CURSOR . . . . . .  C ADDR   014BH   A   
+SOE_46. . . . . . . .  C ADDR   08A5H   A   
+SPACE_TYPE. . . . . .  C ADDR   006CH   A   
+START_AGAIN . . . . .  C ADDR   08D3H   A   
+WELCOME_MSG . . . . .  C ADDR   0300H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

@@ -1,0 +1,3 @@
+".\Objects\Function_Generator.obj" 
+TO ".\Objects\Function_Generator" 
+PRINT(".\Listings\Function_Generator.m51") RAMSIZE(256) 

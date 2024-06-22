@@ -1,0 +1,946 @@
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\FG_Eldeep.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE FG_Eldeep.asm SET(SMALL) DEBUG PRINT(.\Listings\FG_Eldeep.lst) OBJECT(.
+                      \Objects\FG_Eldeep.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;*****************************************************************************************
+                       2     ;************************** Function Generator using 8051 Assembly code ******************
+                       3     ;*****************************************************************************************
+                       4     
+                       5     ;******************************* Ports and Pins configuration ****************************
+                       6     
+  0080                 7     DAC EQU P0
+  0090                 8     KEYPAD_PORT EQU P1
+  0090                 9     C1 BIT P1.0
+  0091                10     C2 BIT P1.1
+  0092                11     C3 BIT P1.2
+  0093                12     C4 BIT P1.3
+  0094                13     RO4 BIT P1.4
+  0095                14     RO3 BIT P1.5
+  0096                15     RO2 BIT P1.6
+  0097                16     RO1 BIT P1.7
+  00B0                17     LCD_PORT EQU P3
+  00A6                18     Rs BIT P2.6
+  00A7                19     E BIT P2.7
+  00A5                20     SAB BIT P2.5                                                                    ;SELECT AGA
+                             IN push button
+                      21     
+  0090                22     SIGNAL_TYPE EQU 90H                                                     ;a place in RAM to 
+                             hold the value of signal type
+  00AA                23     DELAY_VALUE EQU 0AAH                                                    ;a place in RAM to 
+                             hold the value of delay
+  00BB                24     TEMP EQU 0BBH                                                                   ;a place in
+                              RAM to hold temporary value
+  00CC                25     FREQ EQU 0CCH                                                                   ;a place in
+                              RAM to hold frequency value in decimal
+  00DD                26     REG_DEB EQU 0DDH                                                                ;a place in
+                              RAM to hold old value of pressed button for debounce
+                      27     
+                      28     ;*****************************************************************************************
+                      29     
+                      30     ;********************************* MESSAGES AND KEYPAD VALUES ****************************
+                      31     
+F100                  32     ORG 0F100H                                                              ;ERROR MESSAGE     
+                                                
+F100 4552524F         33             ERR: DB 'ERROR!',0      
+F104 522100                  
+                      34     
+F200                  35     ORG 0F200H                                        ;WELCOME MESSAGE
+F200 48454C4C         36             WELCOME_MSG: DB 'HELLO WORLD!',0
+F204 4F20574F                
+F208 524C4421                
+F20C 00                      
+                      37     
+F300                  38     ORG 0F300H                                                      ;HZ MESSAGE
+F300 4B487A00         39             HZ_MSG1: DB 'KHz',0
+                      40                     
+F400                  41     ORG 0F400H                                        ;KEYBOARD BUTTONS
+F400 3738392F         42             ROW1: DB '7','8','9','/',0
+F404 00                      
+F405 3435362A         43             ROW2: DB '4','5','6','*',0
+F409 00                      
+F40A 3132332D         44             ROW3: DB '1','2','3','-',0
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     2
+
+F40E 00                      
+F40F 43302E2B         45             ROW4: DB 'C','0','.','+',0                              
+F413 00                      
+                      46     
+F500                  47     ORG 0F500H                                        ;ENTER FREQUENCY MESSAGE
+F500 454E5445         48             FREQUENCY_MSG: DB 'ENTER F =',0
+F504 52204620                
+F508 3D00                    
+                      49     
+F600                  50     ORG 0F600H                                                                              ;EN
+                             TER SIGNAL TYPE MESSAGE
+F600 454E5445         51             SIGNAL_TYPE_MSG: DB 'ENTER SIG TYP:',0
+F604 52205349                
+F608 47205459                
+F60C 503A00                  
+                      52                     
+F700                  53     ORG 0F700H                                                                              ;SI
+                             NE WAVE VALUES IN LOOKUP-TABLE FORM
+F700 8096ACC0         54             SIN_FUN_VALUES: DB 128,150,172,192,210,226,239,248,253,255,253,248,239,226,210,192,
+                             172,150,128,106,84,64,46,30,17,8,2,0,2,8,17,30,46,64,84,106,128
+F704 D2E2EFF8                
+F708 FDFFFDF8                
+F70C EFE2D2C0                
+F710 AC96806A                
+F714 54402E1E                
+F718 11080200                
+F71C 0208111E                
+F720 2E40546A                
+F724 80                      
+                      55                     
+F800                  56     ORG 0F800H                                                                              ;OU
+                             T OF RANGE MESSAGE
+F800 204F5554         57             OUT_OF_RANGE_MESSAGE: DB ' OUT OF RANGE! ',0
+F804 204F4620                
+F808 52414E47                
+F80C 45212000                
+                      58             
+F900                  59     ORG 0F900H                                                                              ;SA
+                             WTOOTH MESSAGE
+F900 53415754         60             SAWTOOTH_NAME: DB 'SAWTOOTH' ,0
+F904 4F4F5448                
+F908 00                      
+                      61                     
+FA00                  62     ORG 0FA00H                                                                              ;SQ
+                             UARE MESSAGE
+FA00 53515541         63             SQUARE_NAME: DB 'SQUARE' ,0                                     
+FA04 524500                  
+                      64                     
+FB00                  65     ORG 0FB00H                                                                              ;SI
+                             NE MESSAGE
+FB00 53494E45         66             SINE_NAME: DB 'SINE' ,0
+FB04 00                      
+                      67                     
+FC00                  68     ORG 0FC00H
+FC00 53494720         69             DISPLAY_STATUS_SIG_TYP: DB 'SIG TYP:' ,0
+FC04 5459503A                
+FC08 00                      
+                      70     
+FD00                  71     ORG 0FD00H
+FD00 46203D20         72             DISPLAY_STATUS_FREQ: DB 'F = ' ,0
+FD04 00                      
+                      73     
+                      74     ;*****************************************************************************************
+                      75     
+                      76     ;*********************************** USER-DEFINED FUNCTIONS ******************************
+                      77     
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     3
+
+                      78     ; HELLO MESSAGE DISPLAY FUNCTION
+                      79     
+FD05                  80     HELLO_MSG:
+FD05 90F200           81     MOV DPTR,#0F200H                                        
+FD08                  82     AGAIN_HELLO_MSG:
+FD08 E4               83     CLR A
+FD09 93               84     MOVC A,@A+DPTR
+FD0A 6006             85     JZ HERE_HELLO_MSG
+FD0C 120130           86     LCALL LCD_DATA
+FD0F A3               87     INC DPTR
+FD10 80F6             88     SJMP AGAIN_HELLO_MSG
+FD12                  89     HERE_HELLO_MSG:                                          
+FD12 12013F           90     LCALL DELAY
+FD15 12013F           91     LCALL DELAY
+FD18 22               92     RET
+                      93     
+                      94     ;*****************************************************************************************
+                      95     
+                      96     ; ENTER SIGNAL TYPE VALUE MESSAGE DISPLAY FUNCTION
+                      97     
+FD19                  98     SIG_TYP_MSG:
+FD19 90F600           99     MOV DPTR,#0F600H                                        
+FD1C                 100     AGAIN_SIG_TYP_MSG:
+FD1C E4              101     CLR A
+FD1D 93              102     MOVC A,@A+DPTR
+FD1E 6006            103     JZ HERE_SIG_TYP_MSG
+FD20 120130          104     LCALL LCD_DATA
+FD23 A3              105     INC DPTR
+FD24 80F6            106     SJMP AGAIN_SIG_TYP_MSG
+FD26                 107     HERE_SIG_TYP_MSG:
+FD26 12013F          108     LCALL DELAY
+FD29 12013F          109     LCALL DELAY
+FD2C 22              110     RET
+                     111     
+                     112     ;*****************************************************************************************
+                     113     
+                     114     ; ENTER SIGNAL TYPE NAME MESSAGE DISPLAY FUNCTION
+                     115     
+FD2D                 116     SIGNAL_TYPE_STR:
+FD2D E590            117     MOV A,SIGNAL_TYPE
+FD2F B40117          118     CJNE A,#1,NOT_SAWTOOTH_NAME                                                             ;IF
+                              (A!=1) GOTO NOT_SAWTOOTH_NAME ELSE DISPLAY "SAWTOOTH"
+                     119     
+FD32 12011F          120     LCALL LCD_2ND_LINE                                                                         
+                                  ;DISPLAY "SAWTOOTH" IN LCD'S SECOND LINE (A=1)
+FD35 90F900          121     MOV DPTR,#0F900H                                        
+FD38                 122     AGAIN_SAW_NAME:
+FD38 E4              123     CLR A
+FD39 93              124     MOVC A,@A+DPTR
+FD3A 6006            125     JZ HERE_SAW_NAME
+FD3C 120130          126     LCALL LCD_DATA
+FD3F A3              127     INC DPTR
+FD40 80F6            128     SJMP AGAIN_SAW_NAME
+FD42                 129     HERE_SAW_NAME:
+FD42 12013F          130     LCALL DELAY
+FD45 12013F          131     LCALL DELAY
+FD48 22              132     RET
+                     133     
+FD49                 134     NOT_SAWTOOTH_NAME:                                                      
+FD49 B40217          135     CJNE A,#2,NOT_SQUARE_NAME                                                               ;IF
+                              (A!=2) GOTO NOT_SQUARE_NAME ELSE DISPLAY "SQUARE"
+                     136     
+FD4C 12011F          137     LCALL LCD_2ND_LINE                                                                         
+                                  ;DISPLAY "SQUARE" IN LCD'S SECOND LINE (A=2)
+FD4F 90FA00          138     MOV DPTR,#0FA00H                                        
+FD52                 139     AGAIN_SQR_NAME:
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     4
+
+FD52 E4              140     CLR A
+FD53 93              141     MOVC A,@A+DPTR
+FD54 6006            142     JZ HERE_SQR_NAME
+FD56 120130          143     LCALL LCD_DATA
+FD59 A3              144     INC DPTR
+FD5A 80F6            145     SJMP AGAIN_SQR_NAME
+FD5C                 146     HERE_SQR_NAME:
+FD5C 12013F          147     LCALL DELAY
+FD5F 12013F          148     LCALL DELAY
+FD62 22              149     RET
+                     150     
+FD63                 151     NOT_SQUARE_NAME:
+FD63 B40317          152     CJNE A,#3,ERROR_DISPLAY                                                                 ;IF
+                              (A!=3) GOTO ERROR_DISPLAY ELSE DISPLAY "SINE"
+                     153     
+FD66 12011F          154     LCALL LCD_2ND_LINE                                                                         
+                                  ;DISPLAY "SINE" IN LCD'S SECOND LINE (A=3)
+FD69 90FB00          155     MOV DPTR,#0FB00H                                        
+FD6C                 156     AGAIN_SIN_NAME:
+FD6C E4              157     CLR A
+FD6D 93              158     MOVC A,@A+DPTR
+FD6E 6006            159     JZ HERE_SIN_NAME
+FD70 120130          160     LCALL LCD_DATA
+FD73 A3              161     INC DPTR
+FD74 80F6            162     SJMP AGAIN_SIN_NAME
+FD76                 163     HERE_SIN_NAME:
+FD76 12013F          164     LCALL DELAY
+FD79 12013F          165     LCALL DELAY
+FD7C 22              166     RET
+                     167     
+FD7D                 168     ERROR_DISPLAY:
+FD7D 12FDDA          169     LCALL ERROR_MESSAGE
+FD80 22              170     RET
+                     171     
+                     172     ;*****************************************************************************************
+                     173     
+                     174     ; ENTER FREQUENCY VALUE MESSAGE DISPLAY FUNCTION
+                     175     
+FD81                 176     ENT_FREQ_MSG:
+FD81 12010E          177     LCALL LCD_INIT
+FD84 90F500          178     MOV DPTR,#0F500H
+FD87                 179     AGAIN_FREQ_MSG:
+FD87 E4              180     CLR A
+FD88 93              181     MOVC A,@A+DPTR
+FD89 6006            182     JZ HERE_FREQ_MSG
+FD8B 120130          183     LCALL LCD_DATA
+FD8E A3              184     INC DPTR
+FD8F 80F6            185     SJMP AGAIN_FREQ_MSG
+FD91                 186     HERE_FREQ_MSG:
+FD91 22              187     RET
+                     188     
+                     189     ;*****************************************************************************************
+                     190     
+                     191     ; FREQUENCY VALUE PROCESSING FUNCTION
+                     192     
+FD92                 193     GET_FREQUENCY:
+FD92 12011F          194     LCALL LCD_2ND_LINE
+FD95 12013F          195     LCALL DELAY
+                     196     
+                     197     ;FOR FIRST DIGIT "HIGH"
+FD98 120092          198     LCALL READ_KEY
+FD9B 12013F          199     LCALL DELAY
+FD9E 120130          200     LCALL LCD_DATA
+FDA1 540F            201     ANL A,#0FH
+FDA3 F531            202     MOV 31H,A
+                     203     
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     5
+
+                     204     ;FOR SECOND DIGIT  "LOW"
+FDA5 12013F          205     LCALL DELAY       
+FDA8 120092          206     LCALL READ_KEY
+FDAB 12013F          207     LCALL DELAY
+FDAE 120130          208     LCALL LCD_DATA
+FDB1 540F            209     ANL A,#0FH
+FDB3 F530            210     MOV 30H,A
+FDB5 8531F0          211     MOV B,31H
+FDB8 45F0            212     ORL A,B
+FDBA F5CC            213     MOV FREQ,A
+                     214     
+FDBC 12013F          215     LCALL DELAY
+FDBF 12013F          216     LCALL DELAY
+FDC2 22              217     RET
+                     218     
+                     219     ; NOW WE GOT THE FREQUENCY'S DECIMAL VALUE IN 31 (HIGH) & 30 (LOW)
+                     220     
+                     221     ;*****************************************************************************************
+                     222     
+                     223     ; HZ MESSAGE DISPLAY FUNCTION
+                     224     
+FDC3                 225     HZ_MSG:
+FDC3 90F300          226     MOV DPTR,#0F300H
+FDC6                 227     HZ_AGAIN:
+FDC6 E4              228     CLR A
+FDC7 93              229     MOVC A,@A+DPTR
+FDC8 6006            230     JZ OUT_MSG
+FDCA 120130          231     LCALL LCD_DATA
+FDCD A3              232     INC DPTR
+FDCE 80F6            233     SJMP HZ_AGAIN
+FDD0                 234     OUT_MSG:
+                     235     
+FDD0 12013F          236     LCALL DELAY
+FDD3 12013F          237     LCALL DELAY
+FDD6 12010E          238     LCALL LCD_INIT
+FDD9 22              239     RET
+                     240     
+                     241     ;*****************************************************************************************
+                     242     
+                     243     ; ERROR MESSAGE DISPLAY FUNCTION
+                     244     
+FDDA                 245     ERROR_MESSAGE:
+FDDA 12010E          246     LCALL LCD_INIT
+FDDD 90F100          247     MOV DPTR,#0F100H
+FDE0                 248     AGAIN_ERROR:
+FDE0 E4              249     CLR A
+FDE1 93              250     MOVC A,@A+DPTR
+FDE2 6006            251     JZ HERE_ERROR
+FDE4 120130          252     LCALL LCD_DATA
+FDE7 A3              253     INC DPTR
+FDE8 80F6            254     SJMP AGAIN_ERROR
+FDEA                 255     HERE_ERROR:
+FDEA 12013F          256     LCALL DELAY
+FDED 12013F          257     LCALL DELAY
+FDF0 12010E          258     LCALL LCD_INIT
+FDF3 020030          259     LJMP START_AGAIN
+FDF6 22              260     RET
+                     261     
+                     262     ;*****************************************************************************************
+                     263     
+                     264     ; OUT OF RANGE MESSAGE DISPLAY FUNCTION
+                     265     
+FDF7                 266     OORM:
+FDF7 12010E          267     LCALL LCD_INIT
+FDFA 90F800          268     MOV DPTR,#0F800H
+FDFD                 269     AGAIN_OORM:
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     6
+
+FDFD E4              270     CLR A
+FDFE 93              271     MOVC A,@A+DPTR
+FDFF 6006            272     JZ HERE_OORM
+FE01 120130          273     LCALL LCD_DATA
+FE04 A3              274     INC DPTR
+FE05 80F6            275     SJMP AGAIN_OORM
+FE07                 276     HERE_OORM:
+FE07 12013F          277     LCALL DELAY
+FE0A 12013F          278     LCALL DELAY
+FE0D 12010E          279     LCALL LCD_INIT
+FE10 22              280     RET
+                     281     
+                     282     ;*****************************************************************************************
+                     283     
+                     284     ; SAWTOOTH WAVEFORM GENERATION FUNCTION
+                     285     
+FE11                 286     FUN_SAWTOOTH:
+FE11                 287     AGAIN_SAW:
+FE11 12FE2A          288     LCALL CALC_DEL_SAW                                                              ;SUBROUTINE
+                              THAT CALCULATE THE TIMER VALUE TO GENERATE THE SUITABLE DELAY TIME 
+FE14 7F05            289     MOV R7,#5                                                                               ;R7
+                              = NUMBER OF SAWTOOTH WAVEFORM'S LEVELS
+FE16 75F033          290     MOV B,#51                                                                               ;B 
+                              = STEP VALUE
+FE19 7400            291     MOV A,#00H                                                                              ;A 
+                              = 0 (INITIAL VALUE)
+FE1B                 292     REPEAT_FUN_SAW:
+FE1B F580            293     MOV DAC,A                                                                               ;OU
+                             TPUT DIGITAL VALUE FOR CURRENT LEVEL OF SAWTOOTH WAVEFORM
+FE1D 25F0            294     ADD A,B                                                                                 ;A 
+                              = A + B (INCREAMENT THE ACC VALUE BY STEP VALUE)
+FE1F 12FE34          295     LCALL DELAY_SAWTOOTH                                                    ;SUBROUTINE THAT GE
+                             NERATE THE DELAY USING TIMERS
+FE22 DFF7            296     DJNZ R7,REPEAT_FUN_SAW                                                  ;IF (R7!=0) GOTO RE
+                             PEAT_FUN_SAW
+FE24 20A554          297     JB SAB,SELECT_AGAIN_L                                                   ;IF (SAB==1) GOTO S
+                             ELECT AGAIN                  `#FEATURE  :)
+FE27 80E8            298     SJMP AGAIN_SAW                                                                  ;GOTO AGAIN
+                             _SAW TO REPEAT SUBROUTINE
+FE29 22              299     RET                                                                                        
+                                  ;RETURN OPERATION
+                     300     
+                     301     ;*****************************************************************************************
+                     302     
+                     303     ; SAWTOOTH DELAY CALCULATION FUNCTION
+                     304     
+FE2A                 305     CALC_DEL_SAW:                                                                   ;timer valu
+                             e = one's complement (200/f) #EQUATION
+FE2A 74C8            306     MOV A,#200                                                                              ;A 
+                              = 200 (decimal) (numerator)
+FE2C 85CCF0          307     MOV B,FREQ                                                                              ;B 
+                              = f   (decimal) (denumerator)
+FE2F 84              308     DIV AB                                                                                  ;A 
+                              = A/B ( integer result )                    #DESIGN FLAW   :(
+FE30 F4              309     CPL A                                                                                   ;A 
+                              = one's complement (A)
+FE31 F5AA            310     MOV DELAY_VALUE,A                                                               ;DELAY_VALU
+                             E = A  (FOR FURTHER PROCESSING)
+FE33 22              311     RET                                                                                        
+                                  ;RETURN OPERATION
+                     312     
+                     313     ;*****************************************************************************************
+                     314     
+                     315     ; SAWTOOTH DELAY POLLING USING TIMER 1 FUNCTION
+                     316     
+FE34                 317     DELAY_SAWTOOTH:                                                                 ;NOTICE THA
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     7
+
+                             T THE TIMERS ARE ALREADY CONFIGURED IN THE START OF MAIN PROGRAM
+FE34 85AA8D          318     MOV TH1,DELAY_VALUE                                                             ;TH1  = DEL
+                             AY_VALUE
+FE37 D28E            319     SETB TR1                                                                                ;TR
+                             1  = 1   ( START TIMER )                             #FEATURE    (=:<) (CUTE RABIT)
+FE39 308FFD          320     BACK_SAW: JNB TF1,BACK_SAW                                              ;IF (TF1!=1) GOTO B
+                             ACK_ST                       (POLLING METHOD USING TF1)
+FE3C 22              321     RET                                                                                        
+                                  ;RETURN OPERATION
+                     322     
+                     323     ;*****************************************************************************************
+                     324     
+                     325     ; SQUARE WAVEFORM GENERATION FUNCTION
+                     326     
+FE3D                 327     FUN_SQUARE:
+FE3D 12FE52          328     LCALL CALC_DEL_SQU                                                              ;SUBROUTINE
+                              THAT CALCULATE THE TIMER VALUE TO GENERATE THE SUITABLE DELAY TIME
+                     329     
+FE40                 330     AGAIN_SQR:
+FE40 758000          331     MOV DAC,#0                                                                              ;OU
+                             TPUT LOW DIGITAL VALUE OF SQUARE WAVEFORM                                                            
+FE43 12FE60          332     LCALL DELAY_SQUARE                                                              ;SUBROUTINE
+                              THAT GENERATE THE DELAY USING TIMERS
+FE46 7580FF          333     MOV DAC,#255                                                                    ;OUTPUT HIG
+                             H DIGITAL VALUE OF SQUARE WAVEFORM   
+FE49 12FE60          334     LCALL DELAY_SQUARE                                                              ;SUBROUTINE
+                              THAT GENERATE THE DELAY USING TIMERS
+FE4C 20A52C          335     JB SAB,SELECT_AGAIN_L                                                   ;IF (SAB==1) GOTO S
+                             ELECT AGAIN                           #FEATURE  :)
+FE4F 80EF            336     SJMP AGAIN_SQR                                                                  ;GOTO AGAIN
+                             _SQR TO REPEAT SUBROUTINE
+FE51 22              337     RET                                                                                        
+                                  ;RETURN OPERATION
+                     338     
+                     339     ;*****************************************************************************************
+                     340     
+                     341     ; SQUARE DELAY CALCULATION FUNCTION
+                     342     
+FE52                 343     CALC_DEL_SQU:                                                                   ;timer valu
+                             e = one's complement (2*(250/f))      #EQUATION
+FE52 74FA            344     MOV A,#250                                                                              ;A 
+                              = 200 (decimal) (numerator)
+FE54 85CCF0          345     MOV B,FREQ                                                                              ;B 
+                              = f   (decimal) (denumerator)
+FE57 84              346     DIV AB                                                                                  ;A 
+                              = A/B ( integer result )                             #DESIGN FLAW   :(
+FE58 75F002          347     MOV B,#2                                                                                ;B 
+                              = 2   (decimal)
+FE5B A4              348     MUL AB                                                                                  ;A 
+                              = A*B (decimal)     
+FE5C F4              349     CPL A                                                                                   ;A 
+                              = one's complement (A)
+FE5D F5AA            350     MOV DELAY_VALUE,A                                                               ;DELAY_VALU
+                             E = A  (FOR FURTHER PROCESSING)
+FE5F 22              351     RET                                                                                        
+                                  ;RETURN OPERATION
+                     352     
+                     353     ;*****************************************************************************************
+                     354     
+                     355     ; SQUARE DELAY POLLING FUNCTION
+                     356     
+FE60                 357     DELAY_SQUARE:                                                                   ;NOTICE THA
+                             T THE TIMERS ARE ALREADY CONFIGURED IN THE START OF MAIN PROGRAM
+FE60 85AA8D          358     MOV TH1,DELAY_VALUE                                                             ;TH1  = DEL
+                             AY_VALUE
+FE63 D28E            359     SETB TR1                                                                                ;TR
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     8
+
+                             1  = 1   ( START TIMER )                             #FEATURE    (=:<) (SECOND CUTE RABIT)
+FE65 308FFD          360     BACK_SQU: JNB TF1,BACK_SQU                                              ;IF (TF1!=1) GOTO B
+                             ACK_ST                           (POLLING METHOD USING TF1)
+FE68 22              361     RET                                                                                        
+                                  ;RETURN OPERATION
+                     362     
+                     363     ;*****************************************************************************************
+                     364     
+                     365     ; SINE WAVEFORM GENERATION FUNCTION
+                     366     
+FE69                 367     FUN_SINE:                                                                               ;LO
+                             OK-UP TABLE IS USED TO GENERATE SINE WAVEFORM EFFICIENTLY
+FE69                 368     AGAIN_SINE:                                                                     
+FE69 90F700          369     MOV DPTR,#0F700H                                                                        ;DP
+                             TR  = 700H        (WHERE SINE VALUES IS STORED IN RAM)
+FE6C 7A24            370     MOV R2,#36                                                                              ;R2
+                                 = NUMBER OF LEVELS IN SINGLE PERIOD (360/10 = 36) 
+FE6E                 371     BACK_SINE:
+FE6E E4              372     CLR A                                                                                   ;A 
+                                 = 0           (TO START FETCHING SINE VALUES FROM INDEX 700H)
+FE6F 93              373     MOVC A,@A+DPTR                                                                  ;A     = DA
+                             TA STORED IN ADDRESS = DPTR'S VALUE
+FE70 F580            374     MOV DAC,A                                                                               ;OU
+                             TPUT DIGITAL VALUE FOR CURRENT LEVEL OF SAWTOOTH WAVEFORM
+FE72 A3              375     INC DPTR                                                                                ;IN
+                             CREMENT DPTR'S VALUE FOR NEXT SINE VALUE
+FE73 DAF9            376     DJNZ R2, BACK_SINE                                                              ;IF (R2!=0)
+                              GOTO BACK_SINE
+FE75 20A503          377     JB SAB,SELECT_AGAIN_L                                                   ;;IF (SAB==1) GOTO 
+                             SELECT AGAIN                                  #FEATURE  :)
+FE78 80EF            378     SJMP AGAIN_SINE                                                                 ;GOTO AGAIN
+                             _SQR TO REPEAT SUBROUTINE
+FE7A 22              379     RET                                                                                        
+                                  ;RETURN OPERATION
+                     380     
+FE7B                 381     SELECT_AGAIN_L:
+FE7B 020041          382     LJMP SELECT_AGAIN                                                               ;JUMP TO MA
+                             IN PROGRAM TO SELECT NEW WAVEFORM PARAMETERS 
+                     383     
+                     384     ;*****************************************************************************************
+                     385     
+                     386     ; DISPLAY CURRENT STATUS OF OUTPUT SIGNAL FUNCTION
+                     387     
+FE7E                 388     DISPLAY_STATUS:
+                     389     
+FE7E 90FC00          390     MOV DPTR,#0FC00H
+FE81                 391     AGAIN_DIS_ST_SIG_TYP:
+FE81 E4              392     CLR A
+FE82 93              393     MOVC A,@A+DPTR
+FE83 6006            394     JZ HERE_DIS_ST_SIG_TYP
+FE85 120130          395     LCALL LCD_DATA
+FE88 A3              396     INC DPTR
+FE89 80F6            397     SJMP AGAIN_DIS_ST_SIG_TYP
+FE8B                 398     HERE_DIS_ST_SIG_TYP:
+                     399     
+FE8B 12FD2D          400     LCALL SIGNAL_TYPE_STR
+                     401     
+FE8E 12011F          402     LCALL LCD_2ND_LINE
+FE91 90FD00          403     MOV DPTR,#0FD00H
+FE94                 404     AGAIN_DIS_ST_FREQ:
+FE94 E4              405     CLR A
+FE95 93              406     MOVC A,@A+DPTR
+FE96 6006            407     JZ HERE_DIS_ST_FREQ
+FE98 120130          408     LCALL LCD_DATA
+FE9B A3              409     INC DPTR
+FE9C 80F6            410     SJMP AGAIN_DIS_ST_FREQ
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE     9
+
+FE9E                 411     HERE_DIS_ST_FREQ:
+                     412     
+FE9E E530            413     MOV A,30H
+FEA0 4430            414     ORL A,#30H
+FEA2 120130          415     LCALL LCD_DATA
+                     416     
+FEA5 E531            417     MOV A,31H
+FEA7 4430            418     ORL A,#30H
+FEA9 120130          419     LCALL LCD_DATA
+                     420     
+FEAC 7400            421     MOV A,#00H
+FEAE 120130          422     LCALL LCD_DATA
+                     423     
+FEB1 12FDC3          424     LCALL HZ_MSG
+FEB4 22              425     RET
+                     426     
+                     427     ;*****************************************************************************************
+                     428     
+                     429     ;********************************               MAIN PROGRAM            *******************
+                             ***********
+                     430     
+0000                 431     ORG 00H
+0000 020030          432     LJMP MAIN
+                     433     
+                     434     ; INITIATE THE PROGRAM
+                     435     
+0030                 436     ORG 30H              
+                     437     
+0030                 438     MAIN:
+0030                 439     START_AGAIN:    
+0030 7580FF          440     MOV P0,#0FFH                                                                    ;P0 is conn
+                             ected to KEYPAD as an input port     
+0033 D2A5            441     SETB SAB                                                                                ;SA
+                             B "P3.4" is connected to PUSH BUTTON as an input pin
+0035 75900F          442     MOV KEYPAD_PORT,#0FH                            ;INITIALIZE KEYPAD'S ROWS AS OUTPUT PINS AN
+                             D KEYPAD'S COLUMNS AS INPUT PINS
+0038 12010E          443     LCALL LCD_INIT                                                                  ;INITIALIZE
+                              16x2 LCD
+003B 758920          444     MOV TMOD,#20H                                                                   ;INITIALIZE
+                              TIMER 1 IN MODE 2 FOR FURTHER PROCESSING
+                     445     
+003E 12FD05          446     LCALL HELLO_MSG                                                                 ;DISPLAY HE
+                             LLO MESSAEG ON LCD   
+                     447     
+0041                 448     SELECT_AGAIN:
+0041 12010E          449     LCALL LCD_INIT                                                                  ;REINITIALI
+                             ZE LCD FOR DISPLAYING NEW DATA
+                     450     
+                     451     ; INPUT FREQUENCY READING & PROCESSING
+                     452     
+0044 12FD81          453     LCALL ENT_FREQ_MSG                                                              ;DISPLAY EN
+                             TER FREQUENCY MESSAGE ON LCD
+0047 12FD92          454     LCALL GET_FREQUENCY                                                             ;GET FREQUE
+                             NCY VALUE SUBROUTINE 
+004A 12FDC3          455     LCALL HZ_MSG                                                                    ;DISPLAY HZ
+                              MESSAGE ON LCD
+                     456     
+                     457     ; SIGNAL TYPE READING & PROCESSING
+                     458     
+004D 12FD19          459     LCALL SIG_TYP_MSG                                                               ;DISPLAY EN
+                             TER SIGNAL TYPE MESSAGE ON LCD
+0050 120092          460     LCALL READ_KEY                                                                  ;GET SIGNAL
+                              TYPE FROM KEYPAD
+0053 120130          461     LCALL LCD_DATA                                                                  ;DISPLAY SI
+                             GNAL TYPE VALUE ON LCD
+0056 540F            462     ANL A,#0FH                                                              ;CONVERT ASCII TO H
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE    10
+
+                             EX
+0058 F590            463     MOV SIGNAL_TYPE,A                                                               ;SAVE IN RA
+                             M FOR FURTHER PROCESSING
+005A 12FD2D          464     LCALL SIGNAL_TYPE_STR                                                   ;A SUBROUTINE TO DI
+                             SPLAY SIGNAL TYPE NAME ON LCD'S SECOND LINE 
+                     465     
+                     466     ; WAVE GENERATION PROCESS BASED ON SIGNAL TYPE VALUE AND INPUT FREQUENCY
+                     467     
+005D E590            468     MOV A,SIGNAL_TYPE
+                     469     
+005F B4010C          470     CJNE A,#1,NOT_FUN_SAWTOOTH
+0062 12FE11          471     LCALL FUN_SAWTOOTH
+0065 12FE7E          472     LCALL DISPLAY_STATUS
+0068 20A5FD          473     BACK_SAB_1:JB SAB,BACK_SAB_1
+006B 020041          474     LJMP SELECT_AGAIN
+                     475     
+006E                 476     NOT_FUN_SAWTOOTH:
+006E B4020C          477     CJNE A,#2,NOT_FUN_SQUARE
+0071 12FE3D          478     LCALL FUN_SQUARE
+0074 12FE7E          479     LCALL DISPLAY_STATUS
+0077 20A5FD          480     BACK_SAB_2:JB SAB,BACK_SAB_2
+007A 020041          481     LJMP SELECT_AGAIN
+                     482     
+007D                 483     NOT_FUN_SQUARE:
+007D B4030C          484     CJNE A,#3,ERROR
+0080 12FE69          485     LCALL FUN_SINE
+0083 12FE7E          486     LCALL DISPLAY_STATUS
+0086 20A5FD          487     BACK_SAB_3:JB SAB,BACK_SAB_3
+0089 020041          488     LJMP SELECT_AGAIN
+                     489     
+008C                 490     ERROR:
+008C 12FDDA          491     LCALL ERROR_MESSAGE
+008F 020030          492     LJMP START_AGAIN
+                     493     
+                     494     
+                     495     ;************************************ END OF MAIN PROGRAM ********************************
+                     496     
+                     497     ;*****************************************************************************************
+                     498     
+                     499     
+                     500     
+                     501     ;*****************************************************************************************
+                     502     
+                     503     ;************************************ KEYPAD INTERFACING *********************************
+                     504     
+0092                 505     READ_KEY:
+                     506     
+0092                 507     CHECK_1:                                        ;CHECK IF A BUTTON WAS PRESSED
+0092 C297            508     CLR RO1
+0094 C296            509     CLR RO2
+0096 C295            510     CLR RO3
+0098 C294            511     CLR RO4
+                     512     
+009A E590            513     MOV A,KEYPAD_PORT
+009C 540F            514     ANL A,#0FH
+009E B40F02          515     CJNE A,#0FH,CHECK_2
+00A1 80EF            516     SJMP CHECK_1
+00A3                 517     CHECK_2:                                        ;MAYBE IT WAS JUST A SPIKE NOISE SO, WAIT F
+                             OR DEBOUNCE AND CHECK AGAIN
+00A3 3148            518     ACALL DEBOUNCE
+00A5 3148            519     ACALL DEBOUNCE
+00A7 E590            520     MOV A,KEYPAD_PORT
+00A9 540F            521     ANL A,#0FH
+00AB B40F02          522     CJNE A,#0FH,CHECK_ROW
+00AE 80E2            523     SJMP CHECK_1
+                     524     
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE    11
+
+00B0                 525     CHECK_ROW:                                      ;CHECK IN WHICH ROW THE PRESSED BUTTON IS
+00B0 C297            526     CLR RO1
+00B2 D296            527     SETB RO2
+00B4 D295            528     SETB RO3
+00B6 D294            529     SETB RO4
+00B8 E590            530     MOV A,KEYPAD_PORT
+00BA B47F2A          531     CJNE A,#01111111B,ROW_1
+                     532     
+00BD D297            533     SETB RO1
+00BF C296            534     CLR RO2
+00C1 D295            535     SETB RO3
+00C3 D294            536     SETB RO4
+00C5 E590            537     MOV A,KEYPAD_PORT
+00C7 B4BF22          538     CJNE A,#10111111B,ROW_2
+                     539     
+00CA D297            540     SETB RO1
+00CC D296            541     SETB RO2
+00CE C295            542     CLR RO3
+00D0 D294            543     SETB RO4
+00D2 E590            544     MOV A,KEYPAD_PORT
+00D4 B4DF1A          545     CJNE A,#11011111B,ROW_3
+                     546     
+00D7 D297            547     SETB RO1
+00D9 D296            548     SETB RO2
+00DB D295            549     SETB RO3
+00DD C294            550     CLR RO4
+00DF E590            551     MOV A,KEYPAD_PORT
+00E1 B4EF12          552     CJNE A,#11101111B,ROW_4
+                     553     
+00E4 020092          554     LJMP CHECK_1
+                     555     
+00E7                 556     ROW_1:                                          ;PUT THE ADDRESS OF THE RIGHT ROW IN DPTR
+00E7 90F400          557     MOV DPTR,#ROW1
+00EA 800F            558     SJMP FIND
+00EC                 559     ROW_2:
+00EC 90F405          560     MOV DPTR,#ROW2
+00EF 800A            561     SJMP FIND
+00F1                 562     ROW_3:
+00F1 90F40A          563     MOV DPTR,#ROW3
+00F4 8005            564     SJMP FIND
+00F6                 565     ROW_4:
+00F6 90F40F          566     MOV DPTR,#ROW4
+00F9 8000            567     SJMP FIND
+                     568     
+00FB                 569     FIND:                                           ;FIND IN WHICH COLUMN THE PRESSED BUTTON IS
+00FB 13              570     RRC A
+00FC 5003            571     JNC MATCH
+00FE A3              572     INC DPTR
+00FF 80FA            573     SJMP FIND
+                     574     
+0101                 575     MATCH:                                          ;TAKE THE NUNBER AND WRITE IT ON THE LCD
+0101 E4              576     CLR A
+0102 93              577     MOVC A,@A+DPTR
+0103 B44307          578     CJNE A,#'C',PRINT
+0106 12010E          579     LCALL LCD_INIT
+0109 020030          580     LJMP START_AGAIN
+010C 22              581     RET
+010D                 582     PRINT:
+010D 22              583     RET
+                     584     
+                     585     ;*****************************************************************************************
+                     586     
+                     587     ;*********************************** LCD INTERFACING *************************************
+010E                 588     LCD_INIT:
+010E 7480            589     MOV A,#80H                                      ;FORCE CURSOR TO 1ST LINE
+0110 3124            590     ACALL LCD_COMMAND
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE    12
+
+0112 7438            591     MOV A,#38H                                      ;2 LINES AND 5*7 MATRIX
+0114 3124            592     ACALL LCD_COMMAND
+0116 740E            593     MOV A,#0EH                                      ;DISPLAY ON, CURSOR BLINKING
+0118 3124            594     ACALL LCD_COMMAND
+011A 7401            595     MOV A,#01H                                      ;CLEAR DISPLAY SCREEN
+011C 3124            596     ACALL LCD_COMMAND
+011E 22              597     RET
+011F                 598     LCD_2ND_LINE:
+011F 74C0            599     MOV A,#0C0H                                      ;START 2ND LINE 
+0121 3124            600     ACALL LCD_COMMAND
+0123 22              601     RET
+0124                 602     LCD_COMMAND:                                    ;APPLY A COMMAND TO THE LCD
+0124 F5B0            603     MOV LCD_PORT,A
+0126 C2A6            604     CLR Rs
+0128 D2A7            605     SETB E
+012A 00              606     NOP
+012B C2A7            607     CLR E
+012D 313F            608     ACALL DELAY
+012F 22              609     RET
+0130                 610     LCD_DATA:                                       ;WRITE TO THE LCD
+0130 F5B0            611     MOV LCD_PORT,A
+0132 D2A6            612     SETB Rs
+0134 D2A7            613     SETB E
+0136 00              614     NOP
+0137 00              615     NOP
+0138 C2A7            616     CLR E
+013A 313F            617     ACALL DELAY
+013C 313F            618     ACALL DELAY
+013E 22              619     RET
+                     620     
+013F                 621     DELAY:                                          
+013F 7BFF            622     MOV R3,#255
+0141 7AFF            623     LOOP2: MOV R2,#255
+0143 DAFE            624     LOOP1: DJNZ R2,LOOP1
+0145 DBFA            625     DJNZ R3,LOOP2
+0147 22              626     RET
+                     627     
+0148                 628     DEBOUNCE:
+0148 7B3C            629     MOV R3,#60
+014A 7AFF            630     LOOP4: MOV R2,#255
+014C DAFE            631     LOOP3: DJNZ R2,LOOP3
+014E DBFA            632     DJNZ R3,LOOP4
+0150 22              633     RET
+                     634     
+0151                 635     SL_CURSOR:
+0151 7410            636     MOV A,#10H                                      ;SHIFT LEFT CURSOR 
+0153 3124            637     ACALL LCD_COMMAND
+0155 22              638     RET
+                     639     
+                     640     ;*****************************************************************************************
+                     641     ;**********************************    END OF PROGRAM    *********************************
+                     642     ;*****************************************************************************************
+                     643     
+0156                 644     END_PROGRAM:
+                     645     
+                     646     END
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE    13
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E                 T Y P E  V A L U E   ATTRIBUTES
+
+AGAIN_DIS_ST_FREQ. . .  C ADDR   FE94H   A   
+AGAIN_DIS_ST_SIG_TYP .  C ADDR   FE81H   A   
+AGAIN_ERROR. . . . . .  C ADDR   FDE0H   A   
+AGAIN_FREQ_MSG . . . .  C ADDR   FD87H   A   
+AGAIN_HELLO_MSG. . . .  C ADDR   FD08H   A   
+AGAIN_OORM . . . . . .  C ADDR   FDFDH   A   
+AGAIN_SAW. . . . . . .  C ADDR   FE11H   A   
+AGAIN_SAW_NAME . . . .  C ADDR   FD38H   A   
+AGAIN_SIG_TYP_MSG. . .  C ADDR   FD1CH   A   
+AGAIN_SINE . . . . . .  C ADDR   FE69H   A   
+AGAIN_SIN_NAME . . . .  C ADDR   FD6CH   A   
+AGAIN_SQR. . . . . . .  C ADDR   FE40H   A   
+AGAIN_SQR_NAME . . . .  C ADDR   FD52H   A   
+B. . . . . . . . . . .  D ADDR   00F0H   A   
+BACK_SAB_1 . . . . . .  C ADDR   0068H   A   
+BACK_SAB_2 . . . . . .  C ADDR   0077H   A   
+BACK_SAB_3 . . . . . .  C ADDR   0086H   A   
+BACK_SAW . . . . . . .  C ADDR   FE39H   A   
+BACK_SINE. . . . . . .  C ADDR   FE6EH   A   
+BACK_SQU . . . . . . .  C ADDR   FE65H   A   
+C1 . . . . . . . . . .  B ADDR   0090H.0 A   
+C2 . . . . . . . . . .  B ADDR   0090H.1 A   
+C3 . . . . . . . . . .  B ADDR   0090H.2 A   
+C4 . . . . . . . . . .  B ADDR   0090H.3 A   
+CALC_DEL_SAW . . . . .  C ADDR   FE2AH   A   
+CALC_DEL_SQU . . . . .  C ADDR   FE52H   A   
+CHECK_1. . . . . . . .  C ADDR   0092H   A   
+CHECK_2. . . . . . . .  C ADDR   00A3H   A   
+CHECK_ROW. . . . . . .  C ADDR   00B0H   A   
+DAC. . . . . . . . . .  D ADDR   0080H   A   
+DEBOUNCE . . . . . . .  C ADDR   0148H   A   
+DELAY. . . . . . . . .  C ADDR   013FH   A   
+DELAY_SAWTOOTH . . . .  C ADDR   FE34H   A   
+DELAY_SQUARE . . . . .  C ADDR   FE60H   A   
+DELAY_VALUE. . . . . .  N NUMB   00AAH   A   
+DISPLAY_STATUS . . . .  C ADDR   FE7EH   A   
+DISPLAY_STATUS_FREQ. .  C ADDR   FD00H   A   
+DISPLAY_STATUS_SIG_TYP  C ADDR   FC00H   A   
+E. . . . . . . . . . .  B ADDR   00A0H.7 A   
+END_PROGRAM. . . . . .  C ADDR   0156H   A   
+ENT_FREQ_MSG . . . . .  C ADDR   FD81H   A   
+ERR. . . . . . . . . .  C ADDR   F100H   A   
+ERROR. . . . . . . . .  C ADDR   008CH   A   
+ERROR_DISPLAY. . . . .  C ADDR   FD7DH   A   
+ERROR_MESSAGE. . . . .  C ADDR   FDDAH   A   
+FIND . . . . . . . . .  C ADDR   00FBH   A   
+FREQ . . . . . . . . .  N NUMB   00CCH   A   
+FREQUENCY_MSG. . . . .  C ADDR   F500H   A   
+FUN_SAWTOOTH . . . . .  C ADDR   FE11H   A   
+FUN_SINE . . . . . . .  C ADDR   FE69H   A   
+FUN_SQUARE . . . . . .  C ADDR   FE3DH   A   
+GET_FREQUENCY. . . . .  C ADDR   FD92H   A   
+HELLO_MSG. . . . . . .  C ADDR   FD05H   A   
+HERE_DIS_ST_FREQ . . .  C ADDR   FE9EH   A   
+HERE_DIS_ST_SIG_TYP. .  C ADDR   FE8BH   A   
+HERE_ERROR . . . . . .  C ADDR   FDEAH   A   
+HERE_FREQ_MSG. . . . .  C ADDR   FD91H   A   
+HERE_HELLO_MSG . . . .  C ADDR   FD12H   A   
+HERE_OORM. . . . . . .  C ADDR   FE07H   A   
+HERE_SAW_NAME. . . . .  C ADDR   FD42H   A   
+A51 MACRO ASSEMBLER  FG_ELDEEP                                                            03/24/2024 22:18:46 PAGE    14
+
+HERE_SIG_TYP_MSG . . .  C ADDR   FD26H   A   
+HERE_SIN_NAME. . . . .  C ADDR   FD76H   A   
+HERE_SQR_NAME. . . . .  C ADDR   FD5CH   A   
+HZ_AGAIN . . . . . . .  C ADDR   FDC6H   A   
+HZ_MSG . . . . . . . .  C ADDR   FDC3H   A   
+HZ_MSG1. . . . . . . .  C ADDR   F300H   A   
+KEYPAD_PORT. . . . . .  D ADDR   0090H   A   
+LCD_2ND_LINE . . . . .  C ADDR   011FH   A   
+LCD_COMMAND. . . . . .  C ADDR   0124H   A   
+LCD_DATA . . . . . . .  C ADDR   0130H   A   
+LCD_INIT . . . . . . .  C ADDR   010EH   A   
+LCD_PORT . . . . . . .  D ADDR   00B0H   A   
+LOOP1. . . . . . . . .  C ADDR   0143H   A   
+LOOP2. . . . . . . . .  C ADDR   0141H   A   
+LOOP3. . . . . . . . .  C ADDR   014CH   A   
+LOOP4. . . . . . . . .  C ADDR   014AH   A   
+MAIN . . . . . . . . .  C ADDR   0030H   A   
+MATCH. . . . . . . . .  C ADDR   0101H   A   
+NOT_FUN_SAWTOOTH . . .  C ADDR   006EH   A   
+NOT_FUN_SQUARE . . . .  C ADDR   007DH   A   
+NOT_SAWTOOTH_NAME. . .  C ADDR   FD49H   A   
+NOT_SQUARE_NAME. . . .  C ADDR   FD63H   A   
+OORM . . . . . . . . .  C ADDR   FDF7H   A   
+OUT_MSG. . . . . . . .  C ADDR   FDD0H   A   
+OUT_OF_RANGE_MESSAGE .  C ADDR   F800H   A   
+P0 . . . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . . . .  D ADDR   00B0H   A   
+PRINT. . . . . . . . .  C ADDR   010DH   A   
+READ_KEY . . . . . . .  C ADDR   0092H   A   
+REG_DEB. . . . . . . .  N NUMB   00DDH   A   
+REPEAT_FUN_SAW . . . .  C ADDR   FE1BH   A   
+RO1. . . . . . . . . .  B ADDR   0090H.7 A   
+RO2. . . . . . . . . .  B ADDR   0090H.6 A   
+RO3. . . . . . . . . .  B ADDR   0090H.5 A   
+RO4. . . . . . . . . .  B ADDR   0090H.4 A   
+ROW1 . . . . . . . . .  C ADDR   F400H   A   
+ROW2 . . . . . . . . .  C ADDR   F405H   A   
+ROW3 . . . . . . . . .  C ADDR   F40AH   A   
+ROW4 . . . . . . . . .  C ADDR   F40FH   A   
+ROW_1. . . . . . . . .  C ADDR   00E7H   A   
+ROW_2. . . . . . . . .  C ADDR   00ECH   A   
+ROW_3. . . . . . . . .  C ADDR   00F1H   A   
+ROW_4. . . . . . . . .  C ADDR   00F6H   A   
+RS . . . . . . . . . .  B ADDR   00A0H.6 A   
+SAB. . . . . . . . . .  B ADDR   00A0H.5 A   
+SAWTOOTH_NAME. . . . .  C ADDR   F900H   A   
+SELECT_AGAIN . . . . .  C ADDR   0041H   A   
+SELECT_AGAIN_L . . . .  C ADDR   FE7BH   A   
+SIGNAL_TYPE. . . . . .  N NUMB   0090H   A   
+SIGNAL_TYPE_MSG. . . .  C ADDR   F600H   A   
+SIGNAL_TYPE_STR. . . .  C ADDR   FD2DH   A   
+SIG_TYP_MSG. . . . . .  C ADDR   FD19H   A   
+SINE_NAME. . . . . . .  C ADDR   FB00H   A   
+SIN_FUN_VALUES . . . .  C ADDR   F700H   A   
+SL_CURSOR. . . . . . .  C ADDR   0151H   A   
+SQUARE_NAME. . . . . .  C ADDR   FA00H   A   
+START_AGAIN. . . . . .  C ADDR   0030H   A   
+TEMP . . . . . . . . .  N NUMB   00BBH   A   
+TF1. . . . . . . . . .  B ADDR   0088H.7 A   
+TH1. . . . . . . . . .  D ADDR   008DH   A   
+TMOD . . . . . . . . .  D ADDR   0089H   A   
+TR1. . . . . . . . . .  B ADDR   0088H.6 A   
+WELCOME_MSG. . . . . .  C ADDR   F200H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
