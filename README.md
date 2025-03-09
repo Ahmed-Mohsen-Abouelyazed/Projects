@@ -61,7 +61,7 @@ Innovative solutions for intelligent energy distribution and adaptive grid manag
 
 ## 🎓 **About Me**
 I am a passionate **Electrical Control Engineering Student** with a strong focus on **Industrial Automation**, **Embedded Systems**, and **Smart Grids**. I am also interested in leveraging **AI and Quantum Computing** to revolutionize power systems.  
-Connect with me on [LinkedIn](https://www.linkedin.com/) to discuss ideas and collaborate!  
+Connect with me on [LinkedIn](https://www.linkedin.com/in/ahmed-mohsen-abouelyazed) to discuss ideas and collaborate!  
 
 ---
 
@@ -72,14 +72,8 @@ A huge thank you to **Eng. Abdelrhman Shaban**, **OS Academy**, and all my mento
 
 ## 📧 **Contact Me**
 For any questions or collaboration opportunities, feel free to reach out via:  
-- LinkedIn: [Ahmed's Profile](https://www.linkedin.com/)  
-- Email: **your.email@example.com**  
+- LinkedIn: [Ahmed's Profile](https://www.linkedin.com/in/ahmed-mohsen-abouelyazed)  
+- Email: **ahmedmohsen_209@hotmail.com**  
 
----
-
-## 🌐 **License**
-This repository and all associated projects are licensed under the **MIT License**.  
-
----
 
 Let me know if you want any specific projects highlighted or additional sections! 😄
