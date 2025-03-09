@@ -65,11 +65,6 @@ Connect with me on [LinkedIn](https://www.linkedin.com/in/ahmed-mohsen-abouelyaz
 
 ---
 
-## 🤝 **Acknowledgements**
-A huge thank you to **Eng. Abdelrhman Shaban**, **OS Academy**, and all my mentors and collaborators who guided me throughout my projects.  
-
----
-
 ## 📧 **Contact Me**
 For any questions or collaboration opportunities, feel free to reach out via:  
 - LinkedIn: [Ahmed's Profile](https://www.linkedin.com/in/ahmed-mohsen-abouelyazed)  
